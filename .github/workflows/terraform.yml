@@ -5,76 +5,42 @@ on:
     branches:
       - main
   pull_request:
+  
+env:
+  TF_CLOUD_ORGANIZATION: "davinov"
+  TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
+  TF_WORKSPACE: "ingresso_func_incluir_cadastro_filme"
+  CONFIG_DIRECTORY: "./aws-ec2-terraform"
 
 jobs:
   terraform:
-    name: "Terraform"
+    if: github.repository != 'hashicorp-education/learn-terraform-github-actions'
+    name: "Terraform Apply"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Upload Configuration
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+        id: apply-upload
         with:
-          terraform_version: "1.1.7"
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-          
-      - name: Configure Credentials
-        run: |
-          echo "TF_API_TOKEN=${{ secrets.TF_API_TOKEN  }}" >> $GITHUB_ENV
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
 
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-        working-directory: ./aws-ec2-terraform
-      
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-        working-directory: ./aws-ec2-terraform
-        
-      - name: Terraform Workspace List
-        run: terraform workspace list
-        working-directory: ./aws-ec2-terraform
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -detailed-exitcode
-        working-directory: ./aws-ec2-terraform
-
-      - uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      - name: Create Apply Run
+        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+        id: apply-run
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            <details><summary>Show Plan</summary>
-            \`\`\`\n
-            ${process.env.PLAN}
-            \`\`\`
-            </details>
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-            
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
+          workspace: ${{ env.TF_WORKSPACE }}
+          configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
 
-      - name: Terraform Plan Detailed Exit Code
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform plan -detailed-exitcode
-        
+      - name: Apply
+        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
+        if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
+        id: apply
+        with:
+          run: ${{ steps.apply-run.outputs.run_id }}
+          comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
