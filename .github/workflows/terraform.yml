@@ -29,8 +29,8 @@ jobs:
         run: terraform validate -no-color
         working-directory: ./aws-ec2-terraform
         
-      - name: Terraform Workspace Select
-        run: terraform workspace select ingresso_func_incluir_cadastro_filme
+      - name: Terraform Workspace List
+        run: terraform workspace list
         working-directory: ./aws-ec2-terraform
 
       - name: Terraform Plan
