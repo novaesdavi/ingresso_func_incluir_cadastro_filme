@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IncluirCadastroFilmeFunction")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b3711c1f59d313e1d4876321622e7b91bdef54b0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a345d51afbbd6137ccf75f068edda2c4aa9e45a6")]
 [assembly: System.Reflection.AssemblyProductAttribute("IncluirCadastroFilmeFunction")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IncluirCadastroFilmeFunction")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
