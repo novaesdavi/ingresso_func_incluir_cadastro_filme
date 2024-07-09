@@ -6,7 +6,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "app_server" {
-  count                  = 2
+  count                  = 0
   ami                    = "ami-06c68f701d8090592"
   instance_type          = "t2.micro"
   key_name               = "terraform-key-pair"
