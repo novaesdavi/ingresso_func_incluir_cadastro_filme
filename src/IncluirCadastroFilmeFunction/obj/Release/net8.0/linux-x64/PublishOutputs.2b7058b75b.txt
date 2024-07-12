@@ -1,6 +1,0 @@
-C:\Users\dnova\source\repos\ingresso_func_incluir_cadastro_filme\src\IncluirCadastroFilmeFunction\bin\Release\net8.0\publish\IncluirCadastroFilmeFunction.deps.json
-C:\Users\dnova\source\repos\ingresso_func_incluir_cadastro_filme\src\IncluirCadastroFilmeFunction\bin\Release\net8.0\publish\IncluirCadastroFilmeFunction.runtimeconfig.json
-C:\Users\dnova\source\repos\ingresso_func_incluir_cadastro_filme\src\IncluirCadastroFilmeFunction\bin\Release\net8.0\publish\IncluirCadastroFilmeFunction.pdb
-C:\Users\dnova\source\repos\ingresso_func_incluir_cadastro_filme\src\IncluirCadastroFilmeFunction\bin\Release\net8.0\publish\Amazon.Lambda.Core.dll
-C:\Users\dnova\source\repos\ingresso_func_incluir_cadastro_filme\src\IncluirCadastroFilmeFunction\bin\Release\net8.0\publish\Amazon.Lambda.Serialization.SystemTextJson.dll
-C:\Users\dnova\source\repos\ingresso_func_incluir_cadastro_filme\src\IncluirCadastroFilmeFunction\bin\Release\net8.0\publish\IncluirCadastroFilmeFunction.dll
