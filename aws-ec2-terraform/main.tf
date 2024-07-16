@@ -5,6 +5,16 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
+
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.2"
+    }
   }
   required_version = ">= 1.0.4"
 }
@@ -37,15 +47,32 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_lambda_function" "my_lambda" {
-  function_name = "IncluirCadastroFilmeFunction"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
-  runtime       = "dotnet8"
 
-  # Assuming your Lambda code is in a file called "lambda_function.zip"
-  filename         = "../src/IncluirCadastroFilmeFunction/bin/Release/net8.0/IncluirCadastroFilmeFunction.zip"
-  source_code_hash = filebase64sha256("../src/IncluirCadastroFilmeFunction/bin/Release/net8.0/IncluirCadastroFilmeFunction.zip")
+
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "../src/IncluirCadastroFilmeFunction/publish"
+  output_path = "./IncluirCadastroFilmeFunction.zip"
+}
+
+resource "null_resource" "force_deploy" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "echo 'Forcing Lambda deployment'"
+  }
+}
+
+resource "aws_lambda_function" "my_lambda" {
+  function_name    = "IncluirCadastroFilmeFunction"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
+  runtime          = "dotnet8"
+  filename         = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  depends_on       = [null_resource.force_deploy]
 
   environment {
     variables = {
@@ -53,6 +80,8 @@ resource "aws_lambda_function" "my_lambda" {
     }
   }
 }
+
+
 
 resource "aws_security_group" "main" {
   egress = [

@@ -19,7 +19,7 @@ public class Function {
     }
 }
 
-[JsonSerializable (typeof (Filme))]
+[Serializable]
 public class Filme {
     public string Titulo { get; set; }
     public int Ano { get; set; }
