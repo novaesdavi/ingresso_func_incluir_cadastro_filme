@@ -15,7 +15,7 @@ public class Function {
     /// <param name="context">The ILambdaContext that provides methods for logging and describing the Lambda environment.</param>
     /// <returns></returns>
     public string FunctionHandler (Filme input, ILambdaContext context) {
-        return input.Titulo;
+        return input.Titulo.ToUpper ();
     }
 }
 
