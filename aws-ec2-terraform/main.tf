@@ -3,7 +3,17 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.27"
+      version = "~> 5.0"
+    }
+
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.4"
+    }
+
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.2"
     }
   }
   required_version = ">= 1.0.4"
@@ -15,23 +25,63 @@ provider "aws" {
   secret_key = var.AWS_SECRET_ACCESS_KEY
 }
 
-resource "aws_instance" "app_server" {
-  count                  = 0
-  ami                    = "ami-06c68f701d8090592"
-  instance_type          = "t2.micro"
-  key_name               = "terraform-key-pair"
-  vpc_security_group_ids = [aws_security_group.main.id]
+resource "aws_iam_role" "lambda_role" {
+  name = "lambda_ingresso_incrluir_cadastro_role"
 
-  tags = {
-    Name = "First-Ec2-With-Terraform"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+
+
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = "../src/IncluirCadastroFilmeFunction/publish"
+  output_path = "./IncluirCadastroFilmeFunction.zip"
+}
+
+resource "null_resource" "force_deploy" {
+  triggers = {
+    always_run = "${timestamp()}"
   }
-  connection {
-    type    = "ssh"
-    host    = self.public_ip
-    user    = "ec2-user"
-    timeout = "4m"
+
+  provisioner "local-exec" {
+    command = "echo 'Forcing Lambda deployment'"
   }
 }
+
+resource "aws_lambda_function" "my_lambda" {
+  function_name    = "IncluirCadastroFilmeFunction"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
+  runtime          = "dotnet8"
+  filename         = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  depends_on       = [null_resource.force_deploy]
+
+  environment {
+    variables = {
+      # Add any environment variables your Lambda function needs here
+    }
+  }
+}
+
+
 
 resource "aws_security_group" "main" {
   egress = [
@@ -47,18 +97,4 @@ resource "aws_security_group" "main" {
       to_port          = 0
     }
   ]
-  ingress = [
-    {
-      cidr_blocks      = ["0.0.0.0/0", ]
-      description      = ""
-      from_port        = 22
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      protocol         = "tcp"
-      security_groups  = []
-      self             = false
-      to_port          = 22
-    }
-  ]
 }
-
