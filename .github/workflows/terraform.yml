@@ -6,6 +6,7 @@ on:
       - main
   pull_request:
   
+  
 env:
   TF_CLOUD_ORGANIZATION: "davinov"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
