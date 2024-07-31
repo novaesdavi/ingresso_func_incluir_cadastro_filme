@@ -50,9 +50,11 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "./publish"
-  output_path = "./IncluirCadastroFilmeFunction.zip"
+  source_dir  = "${path.module}/publish"
+  output_path = "${path.module}/IncluirCadastroFilmeFunction.zip"
 }
+
+
 
 resource "null_resource" "force_deploy" {
   triggers = {
