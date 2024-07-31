@@ -22,6 +22,7 @@ jobs:
     steps:
 
       - uses: actions/checkout@v4
+      
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -45,8 +46,6 @@ jobs:
       - name: Verify Publish Output
         run: ls -A ./publish
 
-      - name: Checkout
-        uses: actions/checkout@v3
 
       - name: Upload Configuration
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
