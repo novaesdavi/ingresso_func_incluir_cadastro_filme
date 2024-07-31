@@ -41,7 +41,10 @@ jobs:
         run: dotnet test --verbosity normal
         
       - name: Publish Lambda
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish -c Release -o ../publish
+        
+      - name: Create Symlink
+        run: ln -s ../publish ./publish
         
       - name: Verify Publish Output
         run: ls -A ./publish
