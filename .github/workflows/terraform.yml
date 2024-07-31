@@ -49,7 +49,7 @@ jobs:
       - name: List Published Files
         run: |
           echo "Listing all published files:"
-          find ./publish -type f 
+          find ./ingresso_func_incluir_cadastro_filme -type f 
 
       - name: Upload Configuration
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
