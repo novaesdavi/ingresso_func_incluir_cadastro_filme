@@ -45,7 +45,11 @@ jobs:
         
       - name: Verify Publish Output
         run: ls -A ./publish
-
+        
+      - name: List Published Files
+        run: |
+          echo "Listing all published files:"
+          find ./publish -type f 
 
       - name: Upload Configuration
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
