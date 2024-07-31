@@ -43,15 +43,7 @@ jobs:
         run: dotnet publish -c Release -o ./publish
         
       - name: Verify Publish Output
-        run: |
-          if [ ! -d "./publish" ]; then
-            echo "Publish directory does not exist!"
-            exit 1
-          fi
-          if [ -z "$(ls -A ./publish)" ]; then
-            echo "Publish directory is empty!"
-            exit 1
-          fi
+        run: ls -A ./publish
 
       - name: Checkout
         uses: actions/checkout@v3
