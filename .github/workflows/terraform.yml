@@ -12,13 +12,11 @@ env:
   CONFIG_DIRECTORY: "./aws-ec2-terraform"
 
 jobs:
-  terraform:
+  build:
     if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     name: "Terraform Apply"
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
     steps:
 
       - uses: actions/checkout@v4
@@ -41,18 +39,18 @@ jobs:
         run: dotnet test --verbosity normal
         
       - name: Publish Lambda
-        run: dotnet publish -c Release -o ../publish
-        
-      - name: Create Symlink
-        run: ln -s ../publish ./publish
-        
-      - name: Verify Publish Output
-        run: ls -A ./publish
+        run: dotnet publish -c Release -o ./publish
         
       - name: List Published Files
         run: |
           echo "Listing all published files:"
-          find ./publish -type f 
+          find ./publish -type f
+
+      - name: Upload Lambda artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: lambda-artifact
+          path: ./publish
 
       - name: Upload Configuration
         uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
@@ -60,6 +58,17 @@ jobs:
         with:
           workspace: ${{ env.TF_WORKSPACE }}
           directory: ${{ env.CONFIG_DIRECTORY }}
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Download Lambda artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: lambda-artifact
+          path: ./publish
 
       - name: Create Apply Run
         uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
