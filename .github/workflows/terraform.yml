@@ -8,7 +8,7 @@ on:
 env:
   TF_CLOUD_ORGANIZATION: "davinov"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
-  TF_WORKSPACE: "ingresso_func_incluir_cadastro_filme"
+  TF_WORKSPACE: "/home/runner/work/ingresso_func_incluir_cadastro_filme/ingresso_func_incluir_cadastro_filme"
   CONFIG_DIRECTORY: "./aws-ec2-terraform"
 
 jobs:
@@ -51,13 +51,6 @@ jobs:
         with:
           name: lambda-artifact
           path: ./publish
-
-      - name: Upload Configuration
-        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-        id: apply-upload
-        with:
-          workspace: ${{ env.TF_WORKSPACE }}
-          directory: ${{ env.CONFIG_DIRECTORY }}
   
   deploy:
     name: "Deploy"
@@ -65,6 +58,14 @@ jobs:
     needs: build
     
     steps:
+      
+      - name: Upload Configuration
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+        id: apply-upload
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
+        
       - name: Download Lambda artifact
         uses: actions/download-artifact@v2
         with:
@@ -78,7 +79,7 @@ jobs:
         uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
         id: apply-run
         with:
-          workspace: "/home/runner/work/ingresso_func_incluir_cadastro_filme/ingresso_func_incluir_cadastro_filme"
+          workspace: ${{ env.TF_WORKSPACE }}
           configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
           
 
