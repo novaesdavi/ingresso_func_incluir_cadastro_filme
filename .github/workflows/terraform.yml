@@ -70,16 +70,18 @@ jobs:
         with:
           name: lambda-artifact
           path: ./publish
+          
+      - name: Print Working Directory
+        run: pwd
 
       - name: Create Apply Run
         uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
         id: apply-run
         with:
-          workspace: ${{ env.TF_WORKSPACE }}
+          workspace: "/home/runner/work/ingresso_func_incluir_cadastro_filme/ingresso_func_incluir_cadastro_filme"
           configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
           
-      - name: Print Working Directory
-        run: pwd
+
         
       - name: Apply
         uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
