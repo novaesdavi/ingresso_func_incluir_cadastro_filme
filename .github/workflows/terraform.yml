@@ -51,6 +51,13 @@ jobs:
         with:
           name: lambda-artifact
           path: ./publish
+          
+      - name: Upload Configuration
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+        id: apply-upload
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
   
   deploy:
     name: "Deploy"
@@ -59,18 +66,13 @@ jobs:
     
     steps:
       
-      - name: Upload Configuration
-        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-        id: apply-upload
-        with:
-          workspace: ${{ env.TF_WORKSPACE }}
-          directory: ${{ env.CONFIG_DIRECTORY }}
+
         
       - name: Download Lambda artifact
         uses: actions/download-artifact@v2
         with:
           name: lambda-artifact
-          path: ./publish
+          path: ./TF_WORKSPACEpublish
           
       - name: Print Working Directory
         run: pwd
