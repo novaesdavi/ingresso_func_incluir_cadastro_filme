@@ -50,7 +50,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "../../ingresso_func_incluir_cadastro_filme/publish"
+  source_dir  = "../publish"
   output_path = "./ingresso_func_incluir_cadastro_filme/IncluirCadastroFilmeFunction.zip"
 }
 
