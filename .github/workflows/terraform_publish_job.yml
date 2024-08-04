@@ -39,18 +39,16 @@ jobs:
       - name: Test
         run: dotnet test --verbosity normal
         
-      - name: Publish Lambda
-        run: dotnet publish -c Release -o ./publish
-        
-      - name: List Published Files
-        run: |
-          echo "Listing all published files:"
-          find ./publish -type f
+      # aqui você define o pacote que ira subir para AWS informe a pasta do projeto onde se encontra o arquivo .csproj
+      - name: Deploy to Lambda
+        working-directory: ./app/src/[ProjectName]
+        run: dotnet lambda package bootstrap.zip
 
       - name: Upload Lambda artifact
         uses: actions/upload-artifact@v2
         with:
-          name: lambda-artifact
+          retention-days: 1
+          name: bootstrap
           path: ./publish
           
       - name: Upload Configuration
@@ -68,9 +66,9 @@ jobs:
     steps:
         
       - name: Download Lambda artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
-          name: lambda-artifact
+          name: bootstrap
           path: ./${{ env.TF_WORKSPACE }}/publish
           
       - name: Print Working Directory
