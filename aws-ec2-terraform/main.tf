@@ -66,13 +66,12 @@ resource "null_resource" "force_deploy" {
 }
 
 resource "aws_lambda_function" "my_lambda" {
-  function_name    = "IncluirCadastroFilmeFunction"
-  role             = aws_iam_role.lambda_role.arn
-  handler          = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
-  runtime          = "dotnet8"
-  filename         = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  depends_on       = [null_resource.force_deploy]
+  function_name = "IncluirCadastroFilmeFunction"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
+  runtime       = "dotnet8"
+  filename      = "${path.module}/IncluirCadastroFilmeFunction.zip"
+  depends_on    = [null_resource.force_deploy]
 
   environment {
     variables = {
