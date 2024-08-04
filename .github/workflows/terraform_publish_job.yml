@@ -4,7 +4,6 @@ on:
   push:
   pull_request:
     branches: [ "main" , "ingresso_func_incluir_cadastro_filme"]
-    types: [ closed ]
 
 env:
   TF_CLOUD_ORGANIZATION: "davinov"
