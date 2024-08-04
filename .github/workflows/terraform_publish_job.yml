@@ -2,10 +2,8 @@ name: "Terraform"
 
 on:
   push:
-    branches:
-      - "*"
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" , "ingresso_func_incluir_cadastro_filme"]
     types: [ closed ]
 
 env:
