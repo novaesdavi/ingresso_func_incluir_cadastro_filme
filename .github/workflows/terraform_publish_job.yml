@@ -41,7 +41,7 @@ jobs:
         
       # aqui você define o pacote que ira subir para AWS informe a pasta do projeto onde se encontra o arquivo .csproj
       - name: Deploy to Lambda
-        working-directory: ./app/src/[ProjectName]
+        working-directory: ./src/IncluirCadastroFilmeFunction/
         run: dotnet lambda package bootstrap.zip
 
       - name: Upload Lambda artifact
@@ -69,13 +69,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: bootstrap
-          path: ./${{ env.TF_WORKSPACE }}/publish
-          
+
       - name: Print Working Directory
         run: pwd
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Init
         run: terraform init
