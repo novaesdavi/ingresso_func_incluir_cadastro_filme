@@ -51,7 +51,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = path.module
-  output_path = ${path.module}/${local.zip_file}"
+  output_path = "${path.module}/IncluirCadastroFilmeFunction.zip"
 }
 
 
