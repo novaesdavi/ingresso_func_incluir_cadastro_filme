@@ -2,7 +2,8 @@ name: "Terraform"
 
 on:
   push:
-    branches: [ "main" , "ingresso_func_incluir_cadastro_filme"]
+    branches:
+      - ingresso_func_incluir_cadastro_filme
 
 env:
   TF_CLOUD_ORGANIZATION: "davinov"
@@ -39,13 +40,13 @@ jobs:
       # aqui você define o pacote que ira subir para AWS informe a pasta do projeto onde se encontra o arquivo .csproj
       - name: Deploy to Lambda
         working-directory: ./src/IncluirCadastroFilmeFunction/
-        run: dotnet lambda package bootstrap.zip
+        run: dotnet lambda package IncluirCadastroFilmeFunction.zip
 
       - name: Upload Lambda artifact
         uses: actions/upload-artifact@v2
         with:
           retention-days: 1
-          name: bootstrap
+          name: IncluirCadastroFilmeFunction
           path: ./publish
           
       - name: Upload Configuration
@@ -65,7 +66,7 @@ jobs:
       - name: Download Lambda artifact
         uses: actions/download-artifact@v3
         with:
-          name: bootstrap
+          name: IncluirCadastroFilmeFunction
 
       - name: Print Working Directory
         run: pwd
