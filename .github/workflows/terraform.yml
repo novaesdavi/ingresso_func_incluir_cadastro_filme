@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: lambda-artifact
-          path: ./TF_WORKSPACEpublish
+          path: ./${{ env.TF_WORKSPACE }}/publish
           
       - name: Print Working Directory
         run: pwd
