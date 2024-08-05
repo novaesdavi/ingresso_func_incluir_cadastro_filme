@@ -48,14 +48,7 @@ jobs:
         with:
           retention-days: 1
           name: IncluirCadastroFilmeFunction
-          path: ./publish
-          
-      - name: Upload Configuration
-        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-        id: apply-upload
-        with:
-          workspace: ${{ env.TF_WORKSPACE }}
-          directory: ${{ env.CONFIG_DIRECTORY }}
+          path: ./src/IncluirCadastroFilmeFunction/IncluirCadastroFilmeFunction.zip
   
   deploy:
     name: "Deploy"
@@ -63,6 +56,13 @@ jobs:
     needs: build
     
     steps:
+    
+      - name: Upload Configuration
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+        id: apply-upload
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
         
       - name: Download Lambda artifact
         uses: actions/download-artifact@v3
