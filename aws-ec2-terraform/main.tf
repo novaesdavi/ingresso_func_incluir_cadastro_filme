@@ -50,8 +50,8 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "/home/runner/work/ingresso_func_incluir_cadastro_filme/ingresso_func_incluir_cadastro_filme/ingresso_func_incluir_cadastro_filme/publish"
-  output_path = "./IncluirCadastroFilmeFunction.zip"
+  source_dir  = path.module
+  output_path = "${path.module}/IncluirCadastroFilmeFunction.zip"
 }
 
 
@@ -66,13 +66,12 @@ resource "null_resource" "force_deploy" {
 }
 
 resource "aws_lambda_function" "my_lambda" {
-  function_name    = "IncluirCadastroFilmeFunction"
-  role             = aws_iam_role.lambda_role.arn
-  handler          = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
-  runtime          = "dotnet8"
-  filename         = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-  depends_on       = [null_resource.force_deploy]
+  function_name = "IncluirCadastroFilmeFunction"
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
+  runtime       = "dotnet8"
+  filename      = "${path.module}/IncluirCadastroFilmeFunction.zip"
+  depends_on    = [null_resource.force_deploy]
 
   environment {
     variables = {
