@@ -51,7 +51,7 @@ data "aws_iam_role" "lambda_role" {
 # }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
-  role       = aws_iam_role.lambda_role.name
+  role       = data.aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
@@ -75,7 +75,7 @@ resource "null_resource" "force_deploy" {
 
 resource "aws_lambda_function" "my_lambda" {
   function_name = "IncluirCadastroFilmeFunction"
-  role          = aws_iam_role.lambda_role.arn
+  role          = data.aws_iam_role.lambda_role.arn
   handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
   runtime       = "dotnet8"
   filename      = "${path.module}/IncluirCadastroFilmeFunction.zip"
