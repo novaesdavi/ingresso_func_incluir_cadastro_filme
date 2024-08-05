@@ -78,7 +78,7 @@ resource "aws_lambda_function" "my_lambda" {
   role          = data.aws_iam_role.lambda_role.arn
   handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
   runtime       = "dotnet8"
-  filename      = "${path.module}/IncluirCadastroFilmeFunction.zip"
+  filename      = "IncluirCadastroFilmeFunction.zip"
   depends_on    = [null_resource.force_deploy]
 
   environment {
