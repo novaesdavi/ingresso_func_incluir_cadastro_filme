@@ -1,10 +1,10 @@
 name: "Terraform"
 
-on:
-  pull_request:
+on:  
   push:
     branches:
       - ingresso_func_incluir_cadastro_filme
+  pull_request:
 
 env:
   TF_CLOUD_ORGANIZATION: "davinov"
