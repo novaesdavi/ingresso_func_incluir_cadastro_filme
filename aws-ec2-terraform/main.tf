@@ -26,14 +26,8 @@ provider "aws" {
 }
 
 
-data "aws_iam_role" "existing_role" {
-  name = "lambda_ingresso_incrluir_cadastro_role"
-}
-
 resource "aws_iam_role" "lambda_role" {
-  count = length(data.aws_iam_role.existing_role.arn) == 0 ? 1 : 0
-  name  = "lambda_ingresso_incrluir_cadastro_role"
-
+  name = "lambda_ingresso_incrluir_cadastro_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -43,9 +37,13 @@ resource "aws_iam_role" "lambda_role" {
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-      }
+      },
     ]
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
