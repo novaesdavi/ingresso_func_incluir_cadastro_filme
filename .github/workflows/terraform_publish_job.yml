@@ -78,6 +78,9 @@ jobs:
 
       - name: List Files and folders in Working Directory
         run: ls -s
+        
+      - name: Install Zip
+        run: sudo apt-get install zip
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
