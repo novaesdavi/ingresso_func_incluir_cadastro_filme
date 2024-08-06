@@ -13,6 +13,8 @@ env:
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "ingresso_func_incluir_cadastro_filme"
   CONFIG_DIRECTORY: "./aws-ec2-terraform"
+  AWS_REGION: us-east-1
+  LAMBDA_FUNCTION_NAME: IncluirCadastroFilmeFunction
 
 jobs:
   build:
@@ -31,9 +33,6 @@ jobs:
       - name: Install Amazon.Lambda.Tools
         run: dotnet tool install -g Amazon.Lambda.Tools
         
-      - name: Install Zip
-        run: sudo apt-get install zip
-        
       - name: Restore dependencies
         run: dotnet restore
       
@@ -47,17 +46,13 @@ jobs:
       - name: Deploy to Lambda
         working-directory: ./src/IncluirCadastroFilmeFunction/
         run: dotnet lambda package IncluirCadastroFilmeFunction.zip
-        
-      - name: List Files and folders in Working Directory
-        working-directory: ./src/IncluirCadastroFilmeFunction/
-        run: ls -s
 
       - name: Upload Lambda artifact
         uses: actions/upload-artifact@v2
         with:
           retention-days: 1
           name: IncluirCadastroFilmeFunction
-          path: ./src/IncluirCadastroFilmeFunction/bin/Release/net8.0/publish/IncluirCadastroFilmeFunction.zip
+          path: ./src/IncluirCadastroFilmeFunction/IncluirCadastroFilmeFunction.zip
   
   deploy:
     name: "Deploy"
@@ -67,14 +62,7 @@ jobs:
     steps:
     
       - uses: actions/checkout@v4
-    
-      - name: Upload Configuration
-        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-        id: apply-upload
-        with:
-          workspace: ${{ env.TF_WORKSPACE }}
-          directory: ${{ env.CONFIG_DIRECTORY }}
-        
+           
       - name: Download Lambda artifact
         uses: actions/download-artifact@v3
         with:
@@ -83,24 +71,24 @@ jobs:
       - name: List Files and folders in Working Directory
         run: ls -s
         
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          cli_config_credentials_token: ${{ env.TF_API_TOKEN }}
-                  
-      - name: Create Apply Run
-        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
-        id: apply-run
-        with:
-          workspace: ${{ env.TF_WORKSPACE }}
-          configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
-          
-        
-      - name: Apply
-        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
-        if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
-        id: apply
-        with:
-          run: ${{ steps.apply-run.outputs.run_id }}
-          comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
+          terraform_version: 1.0.4
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
           
