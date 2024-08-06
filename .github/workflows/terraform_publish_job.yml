@@ -92,10 +92,13 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: CONFIG_DIRECTORY
 
       - name: Terraform Plan
         run: terraform plan
+        working-directory: CONFIG_DIRECTORY
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: CONFIG_DIRECTORY
           
