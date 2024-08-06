@@ -78,6 +78,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
       - name: Terraform Init
         run: terraform init
         working-directory: ${{ env.CONFIG_DIRECTORY }}
