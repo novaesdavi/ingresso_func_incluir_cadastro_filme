@@ -73,8 +73,8 @@ jobs:
         with:
           name: IncluirCadastroFilmeFunction
 
-      - name: Print Working Directory
-        run: pwd
+      - name: List Files and folders in Working Directory
+        run: ls -S
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
