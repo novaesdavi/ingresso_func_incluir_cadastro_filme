@@ -49,6 +49,7 @@ jobs:
         run: dotnet lambda package IncluirCadastroFilmeFunction.zip
         
       - name: List Files and folders in Working Directory
+        working-directory: ./src/IncluirCadastroFilmeFunction/
         run: ls -s
 
       - name: Upload Lambda artifact
@@ -56,7 +57,7 @@ jobs:
         with:
           retention-days: 1
           name: IncluirCadastroFilmeFunction
-          path: ../publish/IncluirCadastroFilmeFunction.zip
+          path: ./src/IncluirCadastroFilmeFunction/bin/Release/net8.0/publish/IncluirCadastroFilmeFunction.zip
   
   deploy:
     name: "Deploy"
