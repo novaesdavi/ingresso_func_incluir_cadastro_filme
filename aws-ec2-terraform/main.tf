@@ -19,12 +19,6 @@ terraform {
   required_version = ">= 1.0.4"
 }
 
-provider "aws" {
-  region     = "us-east-1"
-  access_key = env.AWS_ACCESS_KEY_ID
-  secret_key = env.AWS_SECRET_ACCESS_KEY
-}
-
 
 data "aws_iam_role" "lambda_role" {
   name = "lambda_ingresso_incrluir_cadastro_role"
@@ -64,7 +58,9 @@ resource "aws_lambda_function" "my_lambda" {
 
   environment {
     variables = {
-      var.AWS_ACCESS_KEY_ID = env.AWS_ACCESS_KEY_ID
+      AWS_REGION            = "us-east-1",
+      AWS_ACCESS_KEY_ID     = env.AWS_ACCESS_KEY_ID,
+      AWS_SECRET_ACCESS_KEY = env.AWS_SECRET_ACCESS_KEY
     }
   }
 }
