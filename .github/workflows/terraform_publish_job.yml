@@ -56,7 +56,7 @@ jobs:
         with:
           retention-days: 1
           name: IncluirCadastroFilmeFunction
-          path: ./IncluirCadastroFilmeFunction.zip
+          path: ../publish/IncluirCadastroFilmeFunction.zip
   
   deploy:
     name: "Deploy"
