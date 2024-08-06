@@ -74,7 +74,7 @@ jobs:
           name: IncluirCadastroFilmeFunction
 
       - name: List Files and folders in Working Directory
-        run: ls -S
+        run: ls -s
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
