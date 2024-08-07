@@ -59,8 +59,6 @@ jobs:
         with:
           name: lambda-artifact
           path: ./publish
-          
-
   
   deploy:
     name: "Deploy"
