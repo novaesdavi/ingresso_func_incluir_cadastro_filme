@@ -1,23 +1,19 @@
-name: "CI/CD Pipeline"
+name: "Terraform"
 
-on:  
-  push:
-    branches:
-      - main
+on:
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
+    types: [ closed ]
 
 env:
   TF_CLOUD_ORGANIZATION: "davinov"
   TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
   TF_WORKSPACE: "ingresso_func_incluir_cadastro_filme"
   CONFIG_DIRECTORY: "./aws-ec2-terraform"
-  AWS_REGION: us-east-1
-  LAMBDA_FUNCTION_NAME: IncluirCadastroFilmeFunction
 
 jobs:
   build:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     name: "Build"
     runs-on: ubuntu-latest
 
@@ -42,17 +38,19 @@ jobs:
       - name: Test
         run: dotnet test --verbosity normal
         
-      # aqui você define o pacote que ira subir para AWS informe a pasta do projeto onde se encontra o arquivo .csproj
-      - name: Deploy to Lambda
-        working-directory: ./src/IncluirCadastroFilmeFunction/
-        run: dotnet lambda package IncluirCadastroFilmeFunction.zip
+      - name: Publish Lambda
+        run: dotnet publish -c Release -o ./publish
+        
+      - name: List Published Files
+        run: ls -s
 
       - name: Upload Lambda artifact
         uses: actions/upload-artifact@v2
         with:
-          retention-days: 1
-          name: IncluirCadastroFilmeFunction
-          path: ./src/IncluirCadastroFilmeFunction/IncluirCadastroFilmeFunction.zip
+          name: lambda-artifact
+          path: ./publish
+          
+
   
   deploy:
     name: "Deploy"
@@ -62,43 +60,34 @@ jobs:
     steps:
     
       - uses: actions/checkout@v4
-           
-      - name: Download Lambda artifact
-        uses: actions/download-artifact@v3
+      
+      - name: Upload Configuration
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+        id: apply-upload
         with:
-          name: IncluirCadastroFilmeFunction
-
-      - name: List Files and folders in Working Directory
-        run: ls -s
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
         
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Download Lambda artifact
+        uses: actions/download-artifact@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Terraform Init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform init
-        working-directory: ${{ env.CONFIG_DIRECTORY }}
-
-      - name: Terraform Plan
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform plan
-        working-directory: ${{ env.CONFIG_DIRECTORY }}
-
-      - name: Terraform Apply
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform apply -auto-approve
-        working-directory: ${{ env.CONFIG_DIRECTORY }}
+          name: lambda-artifact
+          path: ./${{ env.TF_WORKSPACE }}/publish
           
+      - name: List Published Files
+        run: ls -s
+
+      - name: Create Apply Run
+        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+        id: apply-run
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
+        
+      # - name: Apply
+      #   uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
+      #   if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
+      #   id: apply
+      #   with:
+      #     run: ${{ steps.apply-run.outputs.run_id }}
+      #     comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"

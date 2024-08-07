@@ -47,13 +47,29 @@ resource "null_resource" "force_deploy" {
   }
 }
 
-resource "aws_lambda_function" "my_lambda" {
+
+resource "aws_s3_object" "lambda_s3_ingresso" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+
+  key    = "IncluirCadastroFilmeFunction.zip"
+  source = data.archive_file.lambda_zip.output_path
+
+  etag = filemd5(data.archive_file.lambda_zip.output_path)
+}
+
+
+resource "aws_lambda_function" "lambda_cadastro_filme" {
   function_name = "IncluirCadastroFilmeFunction"
-  role          = data.aws_iam_role.lambda_role.arn
-  handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
-  runtime       = "dotnet8"
-  filename      = data.archive_file.lambda_zip.output_path
-  depends_on    = [null_resource.force_deploy]
+  s3_bucket     = aws_s3_bucket.lambda_bucket.id
+  s3_key        = aws_s3_object.lambda_s3_ingresso.key
+
+  role             = data.aws_iam_role.lambda_role.arn
+  handler          = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
+  runtime          = "dotnet8"
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+
+  depends_on = [null_resource.force_deploy]
+
 
   environment {
     variables = {
@@ -62,19 +78,9 @@ resource "aws_lambda_function" "my_lambda" {
 }
 
 
+resource "aws_cloudwatch_log_group" "lambda_log_ingresso" {
+  name = "/aws/lambda/${aws_lambda_function.lambda_cadastro_filme.function_name}"
 
-resource "aws_security_group" "main" {
-  egress = [
-    {
-      cidr_blocks      = ["0.0.0.0/0", ]
-      description      = ""
-      from_port        = 0
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      protocol         = "-1"
-      security_groups  = []
-      self             = false
-      to_port          = 0
-    }
-  ]
+  retention_in_days = 30
 }
+
