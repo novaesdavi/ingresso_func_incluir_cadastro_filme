@@ -19,6 +19,11 @@ terraform {
   required_version = ">= 1.0.4"
 }
 
+provider "aws" {
+
+
+}
+
 data "aws_iam_role" "lambda_role" {
   name = "lambda_ingresso_incrluir_cadastro_role"
 }
