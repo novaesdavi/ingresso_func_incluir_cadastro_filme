@@ -20,9 +20,11 @@ terraform {
 }
 
 provider "aws" {
-
-
+  region     = "us-east-1"
+  access_key = var.AWS_ACCESS_KEY_ID
+  secret_key = var.AWS_SECRET_ACCESS_KEY
 }
+
 
 data "aws_iam_role" "lambda_role" {
   name = "lambda_ingresso_incrluir_cadastro_role"
@@ -52,64 +54,37 @@ resource "null_resource" "force_deploy" {
   }
 }
 
-resource "random_pet" "lambda_bucket_name" {
-  prefix = "ingresso-lambda-bucket"
-  length = 4
-}
-
-
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = random_pet.lambda_bucket_name.id
-}
-
-resource "aws_s3_bucket_ownership_controls" "lambda_bucket" {
-  bucket = aws_s3_bucket.lambda_bucket.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-resource "aws_s3_bucket_acl" "lambda_bucket" {
-  depends_on = [aws_s3_bucket_ownership_controls.lambda_bucket]
-
-  bucket = aws_s3_bucket.lambda_bucket.id
-  acl    = "private"
-}
-
-
-resource "aws_s3_object" "lambda_s3_ingresso" {
-  bucket = aws_s3_bucket.lambda_bucket.id
-
-  key    = "IncluirCadastroFilmeFunction.zip"
-  source = data.archive_file.lambda_zip.output_path
-
-  etag = filemd5(data.archive_file.lambda_zip.output_path)
-}
-
-
-resource "aws_lambda_function" "lambda_cadastro_filme" {
+resource "aws_lambda_function" "my_lambda" {
   function_name = "IncluirCadastroFilmeFunction"
-  s3_bucket     = aws_s3_bucket.lambda_bucket.id
-  s3_key        = aws_s3_object.lambda_s3_ingresso.key
-
-  role             = data.aws_iam_role.lambda_role.arn
-  handler          = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
-  runtime          = "dotnet8"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-
-  depends_on = [null_resource.force_deploy]
-
+  role          = data.aws_iam_role.lambda_role.arn
+  handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
+  runtime       = "dotnet8"
+  filename      = data.archive_file.lambda_zip.output_path
+  depends_on    = [null_resource.force_deploy]
 
   environment {
     variables = {
+      AWS_REGION            = "us-east-1",
+      AWS_ACCESS_KEY_ID     = env.AWS_ACCESS_KEY_ID,
+      AWS_SECRET_ACCESS_KEY = env.AWS_SECRET_ACCESS_KEY
     }
   }
 }
 
 
-resource "aws_cloudwatch_log_group" "lambda_log_ingresso" {
-  name = "/aws/lambda/${aws_lambda_function.lambda_cadastro_filme.function_name}"
 
-  retention_in_days = 30
+resource "aws_security_group" "main" {
+  egress = [
+    {
+      cidr_blocks      = ["0.0.0.0/0", ]
+      description      = ""
+      from_port        = 0
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = "-1"
+      security_groups  = []
+      self             = false
+      to_port          = 0
+    }
+  ]
 }
-
