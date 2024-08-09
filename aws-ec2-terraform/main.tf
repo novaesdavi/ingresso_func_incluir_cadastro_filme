@@ -37,13 +37,6 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 }
 
 
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = path.module
-  output_path = "${path.module}/IncluirCadastroFilmeFunction.zip"
-}
-
-
 resource "null_resource" "force_deploy" {
   triggers = {
     always_run = "${timestamp()}"
@@ -59,7 +52,7 @@ resource "aws_lambda_function" "my_lambda" {
   role          = data.aws_iam_role.lambda_role.arn
   handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
   runtime       = "dotnet8"
-  filename      = data.archive_file.lambda_zip.output_path
+  filename      = "./IncluirCadastroFilmeFunction.zip"
   depends_on    = [null_resource.force_deploy]
 
 }
