@@ -61,7 +61,7 @@ resource "null_resource" "force_deploy" {
 
 resource "aws_lambda_function" "my_lambda" {
   function_name = "IncluirCadastroFilmeFunction"
-  role          = data.aws_iam_role.lambda_role.arn
+  role          = aws_iam_role.lambda_role.arn
   handler       = "IncluirCadastroFilmeFunction::IncluirCadastroFilmeFunction.Function::FunctionHandler"
   runtime       = "dotnet8"
   filename      = "./IncluirCadastroFilmeFunction.zip"
