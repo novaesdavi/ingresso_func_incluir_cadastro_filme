@@ -1,5 +1,6 @@
 using Amazon.Lambda.Core;
 using Amazon.Lambda.TestUtilities;
+using IncluirCadastroFilmeFunction.domain;
 using Xunit;
 
 namespace IncluirCadastroFilmeFunction.Tests;

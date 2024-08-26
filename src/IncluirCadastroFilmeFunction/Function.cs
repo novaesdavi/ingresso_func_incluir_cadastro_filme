@@ -1,7 +1,9 @@
-using System.Text.Json.Serialization;
-using Amazon.Lambda.Core;
+
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
+using Amazon.Lambda.Core;
+using IncluirCadastroFilmeFunction.domain;
+
 [assembly : LambdaSerializer (typeof (Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
 namespace IncluirCadastroFilmeFunction;
@@ -19,9 +21,3 @@ public class Function {
     }
 }
 
-[Serializable]
-public class Filme {
-    public string Titulo { get; set; }
-    public int Ano { get; set; }
-    public string Diretor { get; set; }
-}
