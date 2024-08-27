@@ -15,4 +15,10 @@ dotnet publish -c Release -o ./publish
 }
 ```
 
+``` shell
+dotnet clean
+```
 
+``` shell
+dotnet lambda invoke-function IncluirCadastroFilmeFunction --payload "$(cat .\test\IncluirCadastroFilmeFunction.Tests\LambdaInputFile.json)" out
+```
