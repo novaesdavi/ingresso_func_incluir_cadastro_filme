@@ -1,0 +1,31 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/IncluirCadastroFilmeFunction.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole",
+            "logging": {
+                "moduleLoad": false
+            },
+            "env": {
+                "AWS_LAMBDA_FUNCTION_NAME": "IncluirCadastroFilmeFunction",
+                "AWS_REGION": "us-west-2",
+                "AWS_ACCESS_KEY_ID": "your-access-key-id",
+                "AWS_SECRET_ACCESS_KEY": "your-secret-access-key"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        }
+    ]
+}
