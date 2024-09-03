@@ -27,4 +27,4 @@ dotnet tool install --global Amazon.Lambda.TestTool-6.0 --version 0.15.2<br />
 You can invoke the tool using the following command: dotnet-lambda-test-tool-6.0
 Tool 'amazon.lambda.testtool-6.0' (version '0.15.2') was successfully installed.<br />
 
- attach their debuggers to this tool  on dotnet-lambda-test-tool-6.0 process
+ Attach the debuggers to this tool on dotnet-lambda-test-tool-6.0 process
