@@ -20,11 +20,11 @@ dotnet clean
 ```
 Teste local<br />
 
-https://www.nuget.org/packages/Amazon.Lambda.TestTool-6.0<br />
+https://github.com/aws/aws-lambda-dotnet/tree/master/Tools/LambdaTestTool<br />
 
-dotnet tool install --global Amazon.Lambda.TestTool-6.0 --version 0.15.2<br />
+dotnet tool install --global Amazon.Lambda.TestTool-8.0 --version 0.15.2<br />
 
 You can invoke the tool using the following command: dotnet-lambda-test-tool-6.0
-Tool 'amazon.lambda.testtool-6.0' (version '0.15.2') was successfully installed.<br />
+Tool 'amazon.lambda.testtool-8.0' (version '0.15.2') was successfully installed.<br />
 
- Attach the debuggers to this tool on dotnet-lambda-test-tool-6.0 process
+ Attach the debuggers to this tool on dotnet-lambda-test-tool-8.0 process
